@@ -201,3 +201,10 @@ ALTER TABLE ONLY public.users_answers
 
 ALTER TABLE ONLY public.users_answers
     ADD CONSTRAINT users_answers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Name: users_answers users_answers_unique_contraint; Type: UNIQUE CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_answers
+    ADD CONSTRAINT users_answers_unique_contraint UNIQUE (user_id, answer_id)

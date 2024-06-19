@@ -9,6 +9,7 @@ import Poll from "./components/Poll";
 import Login from "./components/Login";
 import EditPoll from "./components/EditPoll";
 import ManageCatalouge from "./components/ManageCatalouge";
+import SignUp from "./components/SignUp";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
       { path: "/polls", element: <Polls /> },
       { path: "/polls/:id", element: <Poll /> },
       { path: "/login", element: <Login /> },
+      { path: "/signup", element: <SignUp /> },
       { path: "/manage_polls/0", element: <EditPoll /> },
       { path: "/manage-catalouge", element: <ManageCatalouge /> },
       { path: "/manage_polls/:id", element: <EditPoll /> },

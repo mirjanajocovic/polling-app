@@ -263,11 +263,29 @@ func (app *application) CreateUser(w http.ResponseWriter, r *http.Request) {
 	user.Password = hashedPassword
 
 	newID, err := app.DB.InsertUser(&user)
+		if err != nil {
+			app.errorJSON(w, err)
+		return
+	}
+
+	// create jwt user
+	u := jwtUser{
+		ID: newID,
+		FirstName: user.FirstName,
+		LastName: user.LastName,
+	}
+
+	// generate tokens
+	tokens, err := app.auth.GenerateTokenPair(&u)
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
-	app.writeJSON(w, http.StatusAccepted, newID)
+
+	refreshCookie := app.auth.GetRefreshCookie(tokens.RefreshToken)
+	http.SetCookie(w, refreshCookie)
+
+	app.writeJSON(w, http.StatusAccepted, tokens)
 }
 
 func (app *application) Vote(w http.ResponseWriter, r *http.Request) {

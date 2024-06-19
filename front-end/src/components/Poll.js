@@ -48,7 +48,6 @@ const Poll = () => {
         return prevChecks.filter((el) => el !== value);
       }
     });
-    console.log(checks);
   };
 
   const handleSubmit = () => {
