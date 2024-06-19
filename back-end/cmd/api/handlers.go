@@ -273,6 +273,7 @@ func (app *application) CreateUser(w http.ResponseWriter, r *http.Request) {
 func (app *application) Vote(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
 		Answers []int `json:"answers"`
+		PollId string `json:"poll_id"`
 	}
 
 	err := app.readJSON(w, r, &requestPayload)
@@ -287,7 +288,7 @@ func (app *application) Vote(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-	newID, err := app.DB.InserUserVotes(claims.Subject, requestPayload.Answers)
+	newID, err := app.DB.InserUserVotes(claims.Subject, requestPayload.Answers, requestPayload.PollId)
 	if err != nil {
 		app.errorJSON(w, err)
 		return

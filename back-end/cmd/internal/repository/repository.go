@@ -16,5 +16,5 @@ type DatabaseRepo interface {
 	GetUserByEmail(email string) (*models.User, error)
 	GetUserByID(id int) (*models.User, error)
 	InsertUser(user *models.User) (int, error)
-	InserUserVotes(userId string, answerIds []int) ([]int, error)
+	InserUserVotes(userId string, answerIds []int, pollId string) ([]int, error)
 }

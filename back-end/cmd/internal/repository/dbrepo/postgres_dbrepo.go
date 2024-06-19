@@ -298,7 +298,7 @@ func (m *PostgresDBRepo) GetUserByID(id int) (*models.User, error) {
 	return &user, nil
 }
 
-func (m *PostgresDBRepo) InserUserVotes(userId string, answerIds []int) ([]int, error) {
+func (m *PostgresDBRepo) InserUserVotes(userId string, answerIds []int, pollId string) ([]int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -308,6 +308,7 @@ func (m *PostgresDBRepo) InserUserVotes(userId string, answerIds []int) ([]int, 
 
 	
 	// TODO: chek if all answers are from same poll, does all answers exist
+	// TODO: check if vote is alredy present
 
 	var newID int
 	var newIDArray []int
@@ -317,6 +318,15 @@ func (m *PostgresDBRepo) InserUserVotes(userId string, answerIds []int) ([]int, 
 			return []int{}, err
 		}
 		newIDArray = append(newIDArray, newID)
+	}
+
+	stmt = `update polls
+			set number_of_votes = number_of_votes + 1
+			where id = $1`
+
+	_, err := m.DB.ExecContext(ctx, stmt, pollId)
+	if err != nil {
+		return []int{}, err
 	}
 
 	return newIDArray, nil
