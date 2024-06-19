@@ -2,18 +2,46 @@ import { useEffect, useState } from "react";
 import { useParams, useOutletContext } from "react-router-dom";
 import CheckBox from "./form/Checkbox";
 
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
 const Poll = () => {
   const [question, setQuestion] = useState("");
   const [answers, setAnswers] = useState([]);
   const [checks, setChecks] = useState([]);
   const [numberOfVotes, setnumberOfVotes] = useState(0);
   const [voted, setVoted] = useState(false);
+  const [statistics, setStatistics] = useState([]);
 
   let { id } = useParams();
 
   const { jwtToken } = useOutletContext();
   const { setAlertMessage } = useOutletContext();
   const { setAlertClassName } = useOutletContext();
+
+  const data = {
+    labels: answers.map((answer) => answer.answer),
+    datasets: [
+      {
+        label: "Voting results",
+        data: statistics,
+        backgroundColor: [
+          "rgb(22, 114, 136)",
+          "rgb(140, 218, 236)",
+          "rgb(180, 82, 72)",
+          "rgb(212, 140, 132)",
+          "rgb(168, 154, 73)",
+          "rgb(214, 207, 162)",
+          "rgb(60, 180, 100)",
+          "rgb(155, 221, 177)",
+          "rgb(100, 60, 106)",
+          "rgb(131, 99, 148)",
+        ],
+      },
+    ],
+  };
 
   useEffect(() => {
     const headers = new Headers();
@@ -79,6 +107,7 @@ const Poll = () => {
           setAlertClassName("d-none");
           setAlertMessage("");
           setnumberOfVotes((prevVotes) => prevVotes + 1);
+          setStatistics(data);
         }
       })
       .catch((error) => {
@@ -124,6 +153,15 @@ const Poll = () => {
         <button className="btn btn-primary" onClick={handleSubmit}>
           Vote
         </button>
+      )}
+
+      {voted && (
+        <div
+          className="chart-container"
+          style={{ position: "relative", width: "40%", height: "40%" }}
+        >
+          <Doughnut data={data} />
+        </div>
       )}
     </div>
   );

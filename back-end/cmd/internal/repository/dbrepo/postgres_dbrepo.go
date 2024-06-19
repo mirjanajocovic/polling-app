@@ -303,21 +303,18 @@ func (m *PostgresDBRepo) InserUserVotes(userId string, answerIds []int, pollId s
 	defer cancel()
 
 	stmt := `insert into users_answers(user_id, answer_id)
-			values ($1, $2)
-			returning id`
+			values ($1, $2)`
 
 	
 	// TODO: chek if all answers are from same poll, does all answers exist
 	// TODO: check if vote is alredy present
 
-	var newID int
-	var newIDArray []int
+	
 	for i := 0; i < len(answerIds); i++ {
-		err := m.DB.QueryRowContext(ctx, stmt, userId, answerIds[i]).Scan(&newID)
+		_, err := m.DB.ExecContext(ctx, stmt, userId, answerIds[i])
 		if err != nil {
 			return []int{}, err
 		}
-		newIDArray = append(newIDArray, newID)
 	}
 
 	stmt = `update polls
@@ -329,5 +326,35 @@ func (m *PostgresDBRepo) InserUserVotes(userId string, answerIds []int, pollId s
 		return []int{}, err
 	}
 
-	return newIDArray, nil
+	query := `select id from answers where poll_id = $1`
+	rows, err := m.DB.QueryContext(ctx, query, pollId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var allAnswersForPollIds []int
+	for rows.Next() {
+		var a int
+		err := rows.Scan(
+			&a,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		allAnswersForPollIds = append(allAnswersForPollIds, a)
+	}
+
+	var response []int
+	query = `select count(*) from users_answers where answer_id = $1`
+	for i := 0; i < len(allAnswersForPollIds); i++ {
+		var count int
+		err := m.DB.QueryRowContext(ctx, query, allAnswersForPollIds[i]).Scan(&count)
+		if err != nil {
+			return []int{}, err
+		}
+		response = append(response, count)
+	}
+	return response, nil
 }
