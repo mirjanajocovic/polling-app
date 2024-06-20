@@ -32,6 +32,7 @@ const EditPoll = () => {
       // get existing values
       const headers = new Headers();
       headers.append("Content-Type", "application/json");
+      headers.append("Authorization", "Bearer " + jwtToken);
 
       const requestOptions = {
         method: "GET",

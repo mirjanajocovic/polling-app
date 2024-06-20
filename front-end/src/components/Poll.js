@@ -11,7 +11,8 @@ const Poll = () => {
   const [question, setQuestion] = useState("");
   const [answers, setAnswers] = useState([]);
   const [checks, setChecks] = useState([]);
-  const [numberOfVotes, setnumberOfVotes] = useState(0);
+  const [databaseChecks, setDatabaseChecks] = useState([]);
+  const [numberOfVotes, setNumberOfVotes] = useState(0);
   const [voted, setVoted] = useState(false);
   const [statistics, setStatistics] = useState([]);
 
@@ -46,6 +47,7 @@ const Poll = () => {
   useEffect(() => {
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "Bearer " + jwtToken);
 
     const requestOptions = {
       method: "GET",
@@ -57,18 +59,27 @@ const Poll = () => {
       .then((data) => {
         setQuestion(data.question);
         setAnswers(data.answers);
+        let newChecks = data.answers.map((answ) => answ.ckecked_by_user);
+        setDatabaseChecks(newChecks);
         setChecks([]);
-        setnumberOfVotes(data.number_of_votes);
+        let newChecksByUser = data.answers.map((answ) => answ.number_of_votes);
+        setStatistics(newChecksByUser);
+        setNumberOfVotes(data.number_of_votes);
+        setVoted(data.voted);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [id]);
+  }, [id, jwtToken]);
 
-  const handleCheck = (event) => {
+  const handleCheck = (event, index) => {
     const isChecked = event.target.checked;
     const value = event.target.value;
 
+    // console.log("checked: ", isChecked);
+    // console.log("value: ", value);
+
+    databaseChecks[index] = isChecked;
     setChecks((prevChecks) => {
       if (isChecked) {
         return [...prevChecks, parseInt(value)];
@@ -106,16 +117,15 @@ const Poll = () => {
         } else {
           setAlertClassName("d-none");
           setAlertMessage("");
-          setnumberOfVotes((prevVotes) => prevVotes + 1);
+          setNumberOfVotes((prevVotes) => prevVotes + 1);
           setStatistics(data);
+          setVoted(true);
         }
       })
       .catch((error) => {
         setAlertClassName("alert-danger");
         setAlertMessage(error);
       });
-
-    setVoted(true);
   };
 
   return (
@@ -123,8 +133,11 @@ const Poll = () => {
       {/* <pre>
         {JSON.stringify({
           question: question,
+          voted: voted,
           numberOfVotes: numberOfVotes,
           answers: answers,
+          checks: checks,
+          statistics: statistics,
         })}
       </pre> */}
       <div className="row">
@@ -143,7 +156,8 @@ const Poll = () => {
             name={"answer-" + a.id}
             value={a.id}
             key={index}
-            onChange={(event) => handleCheck(event)}
+            checked={databaseChecks[index]}
+            onChange={(event) => handleCheck(event, index)}
             disabled={voted}
           />
         ))}

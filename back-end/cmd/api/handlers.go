@@ -141,7 +141,13 @@ func (app *application) GetPoll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	poll, err := app.DB.OnePoll(pollID)
+	_, claims, err := app.auth.GetTokenFromHeaderAndVerify(w, r)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+	poll, err := app.DB.OnePoll(pollID, claims.Subject)
 	if err != nil {
 		app.errorJSON(w, err)
 		return

@@ -8,7 +8,7 @@ import (
 type DatabaseRepo interface {
 	Connection () *sql.DB
 	AllPolls() ([] *models.Poll, error)
-	OnePoll(id int) (*models.Poll, error)
+	OnePoll(id int, user_id string) (*models.Poll, error)
 	InsertPollWithAnswers(poll models.Poll) (int, error)
 	UpdatePoll(payload models.Poll) error
 	DeletePoll(id int) error

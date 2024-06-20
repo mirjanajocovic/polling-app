@@ -58,7 +58,7 @@ func (m *PostgresDBRepo) AllPolls() ([] *models.Poll, error) {
 	return polls, nil
 }
 
-func (m *PostgresDBRepo) OnePoll(id int) (*models.Poll, error) {
+func (m *PostgresDBRepo) OnePoll(id int, user_id string) (*models.Poll, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -110,6 +110,39 @@ func (m *PostgresDBRepo) OnePoll(id int) (*models.Poll, error) {
 	}
 
 	poll.Answers = answers
+
+	var count int
+	query = `select count(*) from users_answers
+			 where user_id = $1 and answer_id in (
+				select id from answers where poll_id = $2
+			 )`
+	err = m.DB.QueryRowContext(ctx, query, user_id, poll.ID).Scan(&count)
+	if err != nil {
+			return nil, err
+		}
+	poll.Voted = count > 0
+
+	// for chart statistics
+	query = `select count(*) from users_answers where answer_id = $1`
+	for i := 0; i < len(poll.Answers); i++ {
+		var count int
+		err := m.DB.QueryRowContext(ctx, query, poll.Answers[i].ID).Scan(&count)
+		if err != nil {
+			return nil, err
+		}
+		poll.Answers[i].NumberOfVotes = count
+	}
+
+	// for voted answers by user
+	query = `select count(*) from users_answers where answer_id = $1 and user_id = $2`
+	for i := 0; i < len(poll.Answers); i++ {
+		var count int
+		err := m.DB.QueryRowContext(ctx, query, poll.Answers[i].ID, user_id).Scan(&count)
+		if err != nil {
+			return nil, err
+		}
+		poll.Answers[i].VotedByUeser = count > 0
+	}
 
 	return &poll, nil
 }
