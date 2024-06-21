@@ -34,7 +34,7 @@ const SignUp = () => {
       body: JSON.stringify(payload),
     };
 
-    fetch(`/sign_up`, requestOptions)
+    fetch(`${process.env.REACT_APP_BACKEND}/sign_up`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {

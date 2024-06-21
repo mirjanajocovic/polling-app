@@ -39,7 +39,7 @@ const EditPoll = () => {
         headers: headers,
       };
 
-      fetch(`/polls/${id}`, requestOptions)
+      fetch(`${process.env.REACT_APP_BACKEND}/polls/${id}`, requestOptions)
         .then((response) => {
           if (response.status !== 200) {
             setError("Invalid response code: " + response.status);
@@ -88,7 +88,10 @@ const EditPoll = () => {
       };
 
       let answerId = answers[index].id;
-      fetch(`/answers/${answerId}`, requestOptions)
+      fetch(
+        `${process.env.REACT_APP_BACKEND}/answers/${answerId}`,
+        requestOptions
+      )
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
@@ -128,7 +131,10 @@ const EditPoll = () => {
         body: JSON.stringify(payload),
       };
 
-      fetch(`/polls/create_poll`, requestOptions)
+      fetch(
+        `${process.env.REACT_APP_BACKEND}/polls/create_poll`,
+        requestOptions
+      )
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
@@ -161,7 +167,7 @@ const EditPoll = () => {
         body: JSON.stringify(payload),
       };
 
-      fetch(`/polls/${id}`, requestOptions)
+      fetch(`${process.env.REACT_APP_BACKEND}/polls/${id}`, requestOptions)
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
@@ -199,7 +205,7 @@ const EditPoll = () => {
           headers: headers,
         };
 
-        fetch(`/polls/${id}`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND}/polls/${id}`, requestOptions)
           .then((response) => response.json())
           .then((data) => {
             if (data.error) {

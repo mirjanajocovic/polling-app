@@ -13,7 +13,7 @@ const ManageCatalouge = () => {
       headers: headers,
     };
 
-    fetch(`http://localhost:8080/polls`, requestOptions)
+    fetch(`${process.env.REACT_APP_BACKEND}/polls`, requestOptions)
       .then((response) => response.json())
       .then((data) => setPolls(data))
       .catch((err) => {

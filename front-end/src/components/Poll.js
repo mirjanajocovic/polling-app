@@ -54,7 +54,7 @@ const Poll = () => {
       headers: headers,
     };
 
-    fetch(`/polls/${id}`, requestOptions)
+    fetch(`${process.env.REACT_APP_BACKEND}/polls/${id}`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
         setQuestion(data.question);
@@ -108,7 +108,7 @@ const Poll = () => {
       body: JSON.stringify(payload),
     };
 
-    fetch(`/vote`, requestOptions)
+    fetch(`${process.env.REACT_APP_BACKEND}/vote`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
