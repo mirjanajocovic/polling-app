@@ -8,6 +8,7 @@ const SignUp = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
+  const { setJwtToken } = useOutletContext();
   const { setAlertMessage } = useOutletContext();
   const { setAlertClassName } = useOutletContext();
   const { toggleRefresh } = useOutletContext();
@@ -41,6 +42,7 @@ const SignUp = () => {
           setAlertClassName("alert-danger");
           setAlertMessage(data.message);
         } else {
+          setJwtToken(data.access_token);
           setAlertClassName("d-none");
           setAlertMessage("");
           toggleRefresh(true);
